@@ -27,7 +27,16 @@ class Ambiente:
       tesouro_pos = (random.randint(1, self.n-1), random.randint(0, self.m-1))
       grid[tesouro_pos[0]][tesouro_pos[1]] = 'T'
 
-      #insere indices de 
+      #insere indices de tesouro nas 8 posicoes ao redor do tesouro
+      for dx in [-1, 0, 1]:
+          for dy in [-1, 0, 1]:
+              if dx == 0 and dy == 0:
+                  continue
+              nx = tesouro_pos[0] + dx 
+              ny = tesouro_pos[1] + dy
+              if 0 <= nx < self.n and 0 <= ny < self.m:
+                  grid[nx][ny] = '+'
+                  
       return grid
 
    def encontrar_tesouro(self):
@@ -65,7 +74,6 @@ class Ambiente:
       self.agente_pos = nova_pos
       return "OK"
 
-      
    def mostrar_grid_atual(self, visao_total = False):
       '''
          Método de exibição do ambiente atual
