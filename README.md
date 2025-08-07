@@ -5,7 +5,7 @@ Este projeto tem como
 
 ## Equipe de Desenvolvimento
 - Dhiego Vinicius da Costa
-- Emillieny de Souza Silva
+- Emilieny de Souza Silva
 - Marino Paulino Mouzinho da Silva
 
 ## Técnicas de IA Utilizadas
