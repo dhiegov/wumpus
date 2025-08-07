@@ -24,7 +24,7 @@ class Ambiente:
       grid = [[' ' for _ in range(self.m)] for _ in range(self.n)]
 
       #insere o tesouro aleatoriamente
-      tesouro_pos = (random.int(1, self.n-1), random.int(0, self.m-1))
+      tesouro_pos = (random.randint(1, self.n-1), random.randint(0, self.m-1))
       grid[tesouro_pos[0]][tesouro_pos[1]] = 'T'
 
       #insere indices de 
@@ -83,5 +83,5 @@ class Ambiente:
                linha.append(" "+self.grid[i][j]+" ")
             else:
                linha.append(" ? ")
-         print(f' {i} | '.join(linha))
-  
+         print(f'{i} | ', end='')
+         print(' '.join(linha))
