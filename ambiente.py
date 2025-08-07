@@ -73,7 +73,8 @@ class Ambiente:
          - Visão Total = True: Apresenta o agente e o conteúdo de todas posições do ambiente, independente se foi visitado ou não
       '''
       header = [f' {i} ' for i in range(self.m)]
-      print('    '.join(header))
+      print('    ', end='')
+      print(' '.join(header))
       for i in range(self.n):
          linha=[]
          for j in range(self.m):
