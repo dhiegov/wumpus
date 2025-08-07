@@ -17,7 +17,7 @@ class Ambiente:
          - Adiciona o Tesouro em posição n>1 e m>=0
          - Aplica os indicadores de tesouro ao redor da posicao do tesouro
          - Adiciona 1 a 3 poços e aplica seus indicadores ao redor de cada poço
-         - Adiciona 4 à 10 obstaculos aleatorios ao grid
+         - Adiciona 4 à 6 obstaculos aleatorios ao grid
       '''
 
       #Gera o grid do ambiente
@@ -36,7 +36,46 @@ class Ambiente:
               ny = tesouro_pos[1] + dy
               if 0 <= nx < self.n and 0 <= ny < self.m:
                   grid[nx][ny] = '+'
-                  
+
+      #insere poços aleatoriamente
+      num_pocos = random.randint(1, 3)
+      for _ in range(num_pocos):
+          poco_pos = (random.randint(1, self.n-1), random.randint(1, self.m-1))
+          
+          while grid[poco_pos[0]][poco_pos[1]] != ' ':
+              poco_pos = (random.randint(1, self.n-1), random.randint(1, self.m-1))
+              
+          grid[poco_pos[0]][poco_pos[1]] = 'P'
+          
+          #insere indices de poço nas 8 posicoes ao redor do poço
+          for dx in [-1, 0, 1]:
+              for dy in [-1, 0, 1]:
+                  if dx == 0 and dy == 0:
+                      continue
+                  nx = poco_pos[0] + dx
+                  ny = poco_pos[1] + dy
+                  if 0 <= nx < self.n and 0 <= ny < self.m:
+                      if grid[nx][ny] == ' ':
+                          grid[nx][ny] = '-'
+                      elif grid[nx][ny] == '+':
+                          grid[nx][ny] = '-'
+                      elif grid[nx][ny] == 'T':
+                          grid[nx][ny] = 'T'
+                      elif grid[nx][ny] == 'P':
+                          grid[nx][ny] = 'P'
+                      elif grid[nx][ny] == 'X':
+                          grid[nx][ny] = 'X'
+                      else:
+                          grid[nx][ny] = '-'
+
+          #insere obstaculos aleatoriamente
+          num_obstaculos = random.randint(0, 4)
+          for _ in range(num_obstaculos):
+              obstaculo_pos = (random.randint(0, self.n-1), random.randint(1, self.m-1))
+              while grid[obstaculo_pos[0]][obstaculo_pos[1]] in  ['T', 'P', '+', '-']:
+                  obstaculo_pos = (random.randint(0, self.n-1), random.randint(1, self.m-1))
+              grid[obstaculo_pos[0]][obstaculo_pos[1]] = 'X'
+              
       return grid
 
    def encontrar_tesouro(self):
@@ -44,10 +83,10 @@ class Ambiente:
          Função responsável por encontrar o tesouro disposto no grid
       '''
       return 0
-   
+
    def get_percepcao(self, pos):
       '''
-         Método responsável por retornar o conteúdo das células adjacentes à posição passada
+         Método responsável por retornar o conteúdo das células adjacentes a partir da posição passada
       '''
       x,y = pos
       percepcao = {}
@@ -64,13 +103,13 @@ class Ambiente:
       if nova_pos == self.tesouro_pos:
          self.agente_pos = nova_pos
          return "TESOURO"
-      
+
       if self.grid[nova_pos[0]][nova_pos[1]] == 'P':
          return "MORTO"
-      
+
       if self.grid[nova_pos[0]][nova_pos[1]] == 'X':
          return "BLOQUEADO"
-      
+
       self.agente_pos = nova_pos
       return "OK"
 
