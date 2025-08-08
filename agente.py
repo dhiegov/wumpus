@@ -15,11 +15,10 @@ class Agente:
         self.prioridade = {
             'T': 0,    # Tesouro - máxima prioridade
             '+': 1,    # Indício de tesouro
-            '±': 2,    # Indício misto
-            ' ': 3,    # Espaço livre
-            '-': 4,    # Indício de poço
-            'P': 5,    # Poço (deve ser evitado)
-            'X': 6     # Obstáculo (não pode mover)
+            ' ': 2,    # Espaço livre
+            '-': 3,    # Indício de poço
+            'P': 4,    # Poço (deve ser evitado)
+            'X': 5     # Obstáculo (não pode mover)
         }
 
     def atualizar_percepcoes(self):
@@ -102,7 +101,7 @@ class Agente:
         # Se não conhece o tesouro, busca por indícios de tesouro
         min_dist = float('inf')
         for pos, conteudo in self.conhecimento.items():
-            if conteudo in ['+', '±']:  # Indícios de tesouro
+            if conteudo in ['+']:  # Indícios de tesouro
                 dist = abs(pos[0] - posicao[0]) + abs(pos[1] - posicao[1])
                 if dist < min_dist:
                     min_dist = dist
@@ -115,13 +114,11 @@ class Agente:
         if conteudo == 'P' or conteudo == 'X':
             return float('inf')  # Custo infinito para poços e obstáculos
         elif conteudo == '-':
-            return 10  # Alto custo para indícios de poço
-        elif conteudo == '±':
-            return 5   # Custo médio para indícios mistos
+            return 10.0  # Alto custo para indícios de poço
         elif conteudo == '+':
-            return 1   # Baixo custo para indícios de tesouro
+            return 1.0   # Baixo custo para indícios de tesouro
         else:
-            return 1   # Custo padrão para espaços livres
+            return 1.0   # Custo padrão para espaços livres
 
     def get_vizinhos_validos(self, posicao):
         """Retorna vizinhos válidos para movimento"""

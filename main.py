@@ -45,16 +45,16 @@ def main():
 
         # Verifica resultados
         if resultado == "TESOURO":
-            print("\n🎉🎉🎉 TESOURO ENCONTRADO! 🎉🎉🎉")
+            print("\nTESOURO ENCONTRADO!")
             encontrou_tesouro = True
         elif resultado == "MORTO":
-            print("\n💀💀💀 AGENTE MORTO! Caiu em um poço. 💀💀💀")
+            print("\nAGENTE MORTO! Caiu em um poço.")
             morreu = True
 
         time.sleep(0.5)  # Pequena pausa para visualização
 
     if not encontrou_tesouro and not morreu:
-        print("\n⏰ Tempo esgotado! Agente não encontrou o tesouro.")
+        print("\nTempo esgotado! Agente não encontrou o tesouro.")
 
     # Mostra o mapa completo no final
     print("\nMapa completo:")
