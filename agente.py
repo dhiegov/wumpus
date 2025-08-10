@@ -4,14 +4,14 @@ from collections import defaultdict
 
 class Agente:
     def __init__(self, ambiente, nome="Agente", posicao_inicial=(0, 0)):
-        self.ambiente = ambiente
-        self.nome = nome
-        self.posicao = posicao_inicial
-        self.conhecimento = {}  # Mapa de conhecimento individual
-        self.visitados = set()
-        self.fronteira = []
-        self.caminho = []
-        self.conhecimento[self.posicao] = ' '  # Posição inicial é livre
+        self.ambiente = ambiente  # Referência ao ambiente
+        self.nome = nome  # Nome do agente
+        self.posicao = posicao_inicial  # Posição inicial do agente
+        self.conhecimento = {}  # Mapa de conhecimento individual do agente
+        self.visitados = set()  # Conjunto de posições visitadas
+        self.fronteira = []  # Fronteira para busca (usada no A*)
+        self.caminho = []  # Caminho atual planejado
+        self.conhecimento[self.posicao] = ' '  # Marca a posição inicial como livre
 
         # Prioridades para escolha de movimento (quanto menor, melhor)
         self.prioridade = {
@@ -30,10 +30,13 @@ class Agente:
             self.conhecimento[pos] = conteudo
 
     def decidir_proxima_acao(self):
-        """Decide qual a próxima ação do agente usando A* com prevenção de loops"""
+        """
+        Decide qual a próxima ação do agente usando A* com prevenção de loops.
+        Retorna a próxima posição para onde o agente deve se mover.
+        """
         self.atualizar_percepcoes()
 
-        # Verifica se tesouro está visível
+        # Verifica se o tesouro está visível no conhecimento atual
         for pos, conteudo in self.conhecimento.items():
             if conteudo == 'T':
                 return pos
@@ -53,7 +56,10 @@ class Agente:
         return self.movimento_seguro_com_evitacao()
 
     def movimento_seguro_com_evitacao(self):
-        """Encontra movimento seguro evitando posições problemáticas"""
+        """
+        Encontra movimento seguro evitando posições problemáticas e penalizando revisitas.
+        Retorna a melhor posição vizinha para se mover.
+        """
         vizinhos = self.get_vizinhos_validos(self.posicao)
         melhor_movimento = None
         menor_custo = float('inf')
@@ -73,7 +79,10 @@ class Agente:
         return melhor_movimento if melhor_movimento else self.posicao
 
     def busca_a_estrela(self):
-        """Implementa o algoritmo A* para encontrar o tesouro com prevenção de loops"""
+        """
+        Implementa o algoritmo A* para encontrar o tesouro com prevenção de loops.
+        Retorna o caminho encontrado como uma lista de posições.
+        """
         inicio = self.posicao
         fronteira = []
         heapq.heappush(fronteira, (0, inicio))
@@ -87,6 +96,7 @@ class Agente:
         while fronteira:
             _, atual = heapq.heappop(fronteira)
 
+            # Se encontrou o tesouro, reconstrói o caminho
             if self.conhecimento.get(atual, ' ') == 'T':
                 caminho = [atual]
                 while atual in veio_de:
@@ -121,8 +131,11 @@ class Agente:
         return []  # Se não encontrar caminho
 
     def heuristica(self, posicao):
-        """Heurística para A*: distância de Manhattan até o tesouro mais próximo conhecido"""
-        # Primeiro, verifica se conhecemos a posição do tesouro
+        """
+        Heurística para A*: distância de Manhattan até o tesouro mais próximo conhecido.
+        Se não conhece o tesouro, usa indícios de tesouro.
+        """
+        # Primeiro, verifica se conhece a posição do tesouro
         for pos, conteudo in self.conhecimento.items():
             if conteudo == 'T':
                 return abs(pos[0] - posicao[0]) + abs(pos[1] - posicao[1])
@@ -138,7 +151,9 @@ class Agente:
         return min_dist if min_dist != float('inf') else 0
 
     def get_custo_movimento(self, posicao):
-        """Retorna o custo de se mover para uma posição"""
+        """
+        Retorna o custo de se mover para uma posição, baseado no conteúdo conhecido.
+        """
         conteudo = self.conhecimento.get(posicao, ' ')
         if conteudo == 'P' or conteudo == 'X':
             return float('inf')  # Custo infinito para poços e obstáculos
@@ -150,7 +165,9 @@ class Agente:
             return 5.0   # Custo padrão para espaços livres
 
     def get_vizinhos_validos(self, posicao):
-        """Retorna vizinhos válidos para movimento"""
+        """
+        Retorna vizinhos válidos (dentro do grid) para movimento ortogonal.
+        """
         x, y = posicao
         vizinhos = []
         for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
@@ -160,7 +177,10 @@ class Agente:
         return vizinhos
 
     def evitar_loops(self, posicao):
-        """Retorna uma penalidade baseada em quantas vezes a posição foi visitada"""
+        """
+        Retorna uma penalidade baseada em quantas vezes a posição foi visitada.
+        Penaliza revisitas para evitar loops.
+        """
         if posicao in self.visitados:
             return 5 * len([p for p in self.visitados if p == posicao])
         return 0
