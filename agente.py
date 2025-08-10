@@ -3,13 +3,14 @@ import random
 from collections import defaultdict
 
 class Agente:
-    def __init__(self, ambiente):
+    def __init__(self, ambiente, nome="Agente", posicao_inicial=(0, 0)):
         self.ambiente = ambiente
-        self.posicao = ambiente.agente_pos
+        self.nome = nome
+        self.posicao = posicao_inicial
+        self.conhecimento = {}  # Mapa de conhecimento individual
+        self.visitados = set()
         self.fronteira = []
-        self.visitados = set([self.posicao])
         self.caminho = []
-        self.conhecimento = {}  # Mapa do conhecimento do agente sobre o ambiente
         self.conhecimento[self.posicao] = ' '  # Posição inicial é livre
 
         # Prioridades para escolha de movimento (quanto menor, melhor)

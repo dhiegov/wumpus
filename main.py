@@ -11,53 +11,53 @@ Inspirado no mundo de Wumpus e baseado no algoritmo A* para encontrar o tesouro 
 from ambiente import Ambiente
 from agente import Agente
 import time
-from os import system
 import os
 
 def main():
-    # Inicializa o ambiente e o agente
-    ambiente = Ambiente(10, 10)
-    agente = Agente(ambiente)
+    agentes_info = [("Agente 1", (0, 0)), ("Agente 2", (0, 1))]
+    ambiente = Ambiente(10, 10, agentes_info=agentes_info)
+    agentes = [
+        Agente(ambiente, nome="Agente 1", posicao_inicial=(0, 0)),
+        Agente(ambiente, nome="Agente 2", posicao_inicial=(0, 1))
+    ]
 
     print("Ambiente inicial (Visão global):")
     ambiente.mostrar_grid_atual(visao_total=True)
 
     input("\nPressione Enter para iniciar a busca...")
-    system("cls" if os.name == "nt" else "clear")
+    os.system("cls" if os.name == "nt" else "clear")
     tic = 0
     encontrou_tesouro = False
-    morreu = False
+    morreu = [False for _ in agentes]
 
-    while not encontrou_tesouro and not morreu and tic < 100:
-        system("cls" if os.name == "nt" else "clear")
+    while not encontrou_tesouro and not all(morreu) and tic < 100:
         tic += 1
-        print(f"\n--- Tic {tic} ---")
+        for idx, agente in enumerate(agentes):
+            if morreu[idx]:
+                continue
+            os.system("cls" if os.name == "nt" else "clear")  # Limpa antes do movimento de cada agente
+            proxima_pos = agente.decidir_proxima_acao()
+            resultado = ambiente.mover_agente(proxima_pos, agente=agente)
+            agente.posicao = ambiente.agente_posicoes[agente.nome]
 
-        # Agente decide a próxima ação
-        proxima_pos = agente.decidir_proxima_acao()
+            print(f"\n--- Tic {tic} ---")
+            print(f"{agente.nome} moveu para: {proxima_pos}")
+            ambiente.mostrar_grid_atual(visao_total=False)
 
-        # Executa a ação no ambiente
-        resultado = ambiente.mover_agente(proxima_pos)
-        agente.posicao = ambiente.agente_pos
+            if resultado == "TESOURO":
+                print(f"\n{agente.nome} ENCONTROU O TESOURO!")
+                encontrou_tesouro = True
+                break
+            elif resultado == "MORTO":
+                print(f"\n{agente.nome} MORREU! Caiu em um poço.")
+                morreu[idx] = True
 
-        # Mostra o estado atual
-        print(f"Agente moveu para: {proxima_pos}")
-        ambiente.mostrar_grid_atual(visao_total=False)
+            time.sleep(0.5)
+    # Se quiser limpar só a cada tic, mantenha o os.system fora do loop dos agentes
 
-        # Verifica resultados
-        if resultado == "TESOURO":
-            print("\nTESOURO ENCONTRADO!")
-            encontrou_tesouro = True
-        elif resultado == "MORTO":
-            print("\nAGENTE MORTO! Caiu em um poço.")
-            morreu = True
+    if not encontrou_tesouro and not any(morreu):
+        print("\nTempo esgotado! Nenhum agente encontrou o tesouro.")
 
-        time.sleep(0.5)  # Pequena pausa para visualização
-
-    if not encontrou_tesouro and not morreu:
-        print("\nTempo esgotado! Agente não encontrou o tesouro.")
-
-    # Mostra o mapa completo no final
     print("\nMapa completo:")
     ambiente.mostrar_grid_atual(visao_total=True)
 

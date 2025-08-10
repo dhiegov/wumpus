@@ -4,13 +4,17 @@ import random
 
 class Ambiente: 
     # Inicialização do ambiente
-    def __init__(self, n=10, m=10):
+    def __init__(self, n=10, m=10, agentes_info=None):
         self.n = n
         self.m = m
         self.grid = self.gerar_grid_aleatorio()
-        self.agente_pos = (0, 0)
+        self.agente_posicoes = {}
+        if agentes_info is None:
+            agentes_info = [("Agente 1", (0, 0))]
+        for nome, pos in agentes_info:
+            self.agente_posicoes[nome] = pos
         self.tesouro_pos = self.encontrar_tesouro()
-        self.visitados = set([self.agente_pos])
+        self.visitados = set([self.agente_posicoes["Agente 1"]])
 
     def gerar_grid_aleatorio(self):
       '''
@@ -101,47 +105,32 @@ class Ambiente:
                 percepcao[(nx, ny)] = self.grid[nx][ny]
         return percepcao
 
-    def mover_agente(self, nova_pos):
-        '''
-        Método responsável por responder ao agente no ambiente o resultado da tentativa de movimento para uma nova posição
-        '''
-        if nova_pos == self.tesouro_pos:
-            self.agente_pos = nova_pos
-            self.visitados.add(nova_pos)
-            return "TESOURO"
-
-        if self.grid[nova_pos[0]][nova_pos[1]] == 'P':
+    def mover_agente(self, nova_pos, agente):
+        nome = agente.nome
+        if not self.posicao_valida(nova_pos):
+            return "INVALIDO"
+        conteudo = self.grid[nova_pos[0]][nova_pos[1]]
+        self.agente_posicoes[nome] = nova_pos
+        if conteudo == "P":
             return "MORTO"
-
-        if self.grid[nova_pos[0]][nova_pos[1]] == 'X':
-            return "BLOQUEADO"
-
-        self.agente_pos = nova_pos
-        self.visitados.add(nova_pos)
-        return "OK"
+        elif conteudo == "T":
+            return "TESOURO"
+        else:
+            return "OK"
 
     def mostrar_grid_atual(self, visao_total=False):
-        '''
-        Método de exibição do ambiente atual
-        - Visão Total = False: Apresenta o agente e revela o conteudo das posições já visitadas por ele
-        - Visão Total = True: Apresenta o agente e o conteúdo de todas posições do ambiente, independente se foi visitado ou não
-        '''
-        header = [f' {i} ' for i in range(self.m)]
-        print('    ', end='')
-        print(' '.join(header))
         for i in range(self.n):
-            linha = []
+            linha = ""
             for j in range(self.m):
-                if (i, j) == self.agente_pos:
-                    linha.append(" A ")
-                elif visao_total or (i, j) in self.visitados:
-                    conteudo = self.grid[i][j]
-                    # Simplificar a exibição
-                    if conteudo == '±':
-                        linha.append(" ± ")
-                    else:
-                        linha.append(f" {conteudo} ")
+                pos = (i, j)
+                agentes_aqui = [nome for nome, p in self.agente_posicoes.items() if p == pos]
+                if agentes_aqui:
+                    linha += "[" + ",".join(a[0] for a in agentes_aqui) + "]"
                 else:
-                    linha.append(" ? ")
-            print(f'{i} | ', end='')
-            print(' '.join(linha))
+                    # ...restante da visualização...
+                    linha += " " + self.grid[i][j] + " "
+            print(linha)
+    
+    def posicao_valida(self, pos):
+        i, j = pos
+        return 0 <= i < self.n and 0 <= j < self.m and self.grid[i][j] != "X"
