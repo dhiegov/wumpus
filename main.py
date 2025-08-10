@@ -12,6 +12,7 @@ from ambiente import Ambiente
 from agente import Agente
 import time
 from os import system
+import os
 
 def main():
     # Inicializa o ambiente e o agente
@@ -22,13 +23,13 @@ def main():
     ambiente.mostrar_grid_atual(visao_total=True)
 
     input("\nPressione Enter para iniciar a busca...")
-    system("clear")
+    system("cls" if os.name == "nt" else "clear")
     tic = 0
     encontrou_tesouro = False
     morreu = False
 
     while not encontrou_tesouro and not morreu and tic < 100:
-        system("clear")
+        system("cls" if os.name == "nt" else "clear")
         tic += 1
         print(f"\n--- Tic {tic} ---")
 
